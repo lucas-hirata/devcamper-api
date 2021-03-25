@@ -4,8 +4,8 @@
   "description": "Devcamper backend API",
   "main": "server.js",
   "scripts": {
-    "start": "NODE_ENV=production node server",
-    "dev": "nodemon server"
+    "start": "NODE_ENV=production node --experimental-specifier-resolution=node server",
+    "dev": "nodemon --experimental-specifier-resolution=node server"
   },
   "repository": {
     "type": "git",
@@ -17,9 +17,11 @@
     "url": "https://github.com/lucas-hirata/devcamper-api/issues"
   },
   "homepage": "https://github.com/lucas-hirata/devcamper-api#readme",
+  "type": "module",
   "dependencies": {
     "dotenv": "^8.2.0",
-    "express": "^4.17.1"
+    "express": "^4.17.1",
+    "morgan": "^1.10.0"
   },
   "devDependencies": {
     "nodemon": "^2.0.7"
