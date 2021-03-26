@@ -1,3 +1,5 @@
+import Bootcamp from '../models/Bootcamp';
+
 export default class BootcampsController {
     // @desc    List all bootcamps
     // @route   GET /api/v1/bootcamps
@@ -17,6 +19,8 @@ export default class BootcampsController {
     // @route   POST /api/v1/bootcamps
     // @access  Private
     async create(req, res) {
+        console.log(req.body);
+
         return res.status(200).json({ sucess: true, msg: 'Create bootcamp' });
     }
 

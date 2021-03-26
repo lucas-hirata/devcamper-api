@@ -1,9 +1,14 @@
 import express from 'express';
 import dotenv from 'dotenv';
 import morgan from 'morgan';
+import colors from 'colors';
+import connectDb from './config/db';
 
 // Load env vars
 dotenv.config({ path: './config/config.env' });
+
+// Connect to Database
+connectDb();
 
 const app = express();
 
@@ -23,9 +28,18 @@ import bootcampsRoute from './routes/bootcamps';
 app.use('/api/v1/bootcamps', bootcampsRoute);
 
 const PORT = process.env.PORT || 5000;
-app.listen(
+
+const server = app.listen(
     PORT,
     console.log(
-        `Server running in ${process.env.NODE_ENV} mode on port ${PORT}`
+        `Server running in ${process.env.NODE_ENV} mode on port ${PORT}`.yellow
+            .bold
     )
 );
+
+// Default unhandled promise rejection handler
+process.on('unhandledRejection', (err, promise) => {
+    console.log(`Error: ${err.message}`.red);
+    // Close server and exit process
+    server.close(() => process.exit(1));
+});
