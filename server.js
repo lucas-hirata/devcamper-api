@@ -1,12 +1,9 @@
+import './config/config';
 import express from 'express';
-import dotenv from 'dotenv';
 import morgan from 'morgan';
 import colors from 'colors';
-import errorHandler from './middleware/error';
 import connectDb from './config/db';
-
-// Load env vars
-dotenv.config({ path: './config/config.env' });
+import errorHandler from './middleware/errorHandler';
 
 // Connect to Database
 connectDb();
