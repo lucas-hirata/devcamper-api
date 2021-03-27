@@ -1,11 +1,9 @@
 import Bootcamp from '../models/Bootcamp';
 import ErrorResponse from '../utils/errorResponse';
 import asyncHandler from '../middleware/asyncHandler';
-import geocodes from '../utils/geocoder';
 import geocoder from '../utils/geocoder';
-import { query } from 'express';
 
-export default class BootcampsController {
+class BootcampsController {
     // @desc    List all bootcamps
     // @route   GET /api/v1/bootcamps
     // @access  Public
@@ -167,3 +165,5 @@ export default class BootcampsController {
         });
     });
 }
+
+export default new BootcampsController();

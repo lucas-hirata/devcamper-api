@@ -2,21 +2,20 @@ import express from 'express';
 import BootcampsController from '../controllers/bootcamps';
 
 const router = express.Router();
-const bootcampsController = new BootcampsController();
 
 router
     .route('/')
-    .get(bootcampsController.list)
-    .post(bootcampsController.create);
+    .get(BootcampsController.list)
+    .post(BootcampsController.create);
 
 router
     .route('/:id')
-    .get(bootcampsController.get)
-    .put(bootcampsController.update)
-    .delete(bootcampsController.delete);
+    .get(BootcampsController.get)
+    .put(BootcampsController.update)
+    .delete(BootcampsController.delete);
 
 router
     .route('/radius/:zipcode/:distance')
-    .get(bootcampsController.getBootcampsInRadius);
+    .get(BootcampsController.getBootcampsInRadius);
 
 export default router;
