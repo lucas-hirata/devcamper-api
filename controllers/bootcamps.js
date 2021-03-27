@@ -17,7 +17,8 @@ class BootcampsController {
         let queryString = JSON.stringify(requestQuery);
         queryString.replace(/\b(gt|gte|lt|lte|in)\b/g, (match) => `$${match}`);
 
-        let query = Bootcamp.find(JSON.parse(queryString));
+        // Finding resources
+        let query = Bootcamp.find(JSON.parse(queryString)).populate('courses');
 
         // Selecting
         if (req.query.select) {
@@ -72,7 +73,9 @@ class BootcampsController {
     // @route   GET /api/v1/bootcamps/:id
     // @access  Public
     get = asyncHandler(async (req, res, next) => {
-        const bootcamp = await Bootcamp.findById(req.params.id);
+        const bootcamp = await Bootcamp.findById(req.params.id).populate(
+            'courses'
+        );
 
         if (!bootcamp) {
             return next(
@@ -123,7 +126,7 @@ class BootcampsController {
     // @route   DELETE /api/v1/bootcamps/:id
     // @access  Private
     delete = asyncHandler(async (req, res, next) => {
-        const bootcamp = await Bootcamp.findByIdAndDelete(req.params.id);
+        const bootcamp = await Bootcamp.findById(req.params.id);
 
         if (!bootcamp) {
             return next(
@@ -133,6 +136,8 @@ class BootcampsController {
                 )
             );
         }
+
+        bootcamp.remove();
 
         return res.status(200).json({ sucess: true, data: {} });
     });

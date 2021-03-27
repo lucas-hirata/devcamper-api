@@ -18,4 +18,8 @@ router
     .route('/radius/:zipcode/:distance')
     .get(BootcampsController.getBootcampsInRadius);
 
+// Including other resource routers
+import courseRouter from './courses';
+router.use('/:bootcampId/courses', courseRouter);
+
 export default router;
