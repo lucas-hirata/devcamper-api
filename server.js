@@ -2,6 +2,7 @@ import express from 'express';
 import dotenv from 'dotenv';
 import morgan from 'morgan';
 import colors from 'colors';
+import errorHandler from './middleware/error';
 import connectDb from './config/db';
 
 // Load env vars
@@ -11,6 +12,9 @@ dotenv.config({ path: './config/config.env' });
 connectDb();
 
 const app = express();
+
+// Body parser
+app.use(express.json());
 
 // Dev logging middleware
 if (process.env.NODE_ENV === 'development') {
@@ -26,6 +30,9 @@ import bootcampsRoute from './routes/bootcamps';
 
 // Mount routers
 app.use('/api/v1/bootcamps', bootcampsRoute);
+
+// Mount error handler middleware
+app.use(errorHandler);
 
 const PORT = process.env.PORT || 5000;
 
