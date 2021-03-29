@@ -33,10 +33,12 @@ app.get('/', (request, response) => {
 // Route files
 import bootcampsRoute from './routes/bootcamps';
 import coursesRoute from './routes/courses';
+import authRoute from './routes/auth';
 
 // Mount routers
 app.use('/api/v1/bootcamps', bootcampsRoute);
 app.use('/api/v1/courses', coursesRoute);
+app.use('/api/v1/auth', authRoute);
 
 // Mount error handler middleware
 app.use(errorHandler);
