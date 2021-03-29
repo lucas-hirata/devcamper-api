@@ -63,3 +63,8 @@ process.on('unhandledRejection', (err, promise) => {
     // Close server and exit process
     server.close(() => process.exit(1));
 });
+
+process.on('SIGTERM', (err, promise) => {
+    // Close server and exit process
+    server.close(() => process.exit(1));
+});
