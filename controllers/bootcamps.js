@@ -2,6 +2,7 @@ import Bootcamp from '../models/Bootcamp';
 import ErrorResponse from '../utils/errorResponse';
 import asyncHandler from '../middleware/asyncHandler';
 import geocoder from '../utils/geocoder';
+import StatusCodes from 'http-status-codes';
 
 class BootcampsController {
     // @desc    List all bootcamps
@@ -61,7 +62,7 @@ class BootcampsController {
             };
         }
 
-        return res.status(200).json({
+        return res.status(StatusCodes.OK).json({
             sucess: true,
             count: bootcamps.length,
             pagination,
@@ -81,12 +82,14 @@ class BootcampsController {
             return next(
                 new ErrorResponse(
                     `Bootcamp not found with id of ${req.params.id}`,
-                    404
+                    StatusCodes.NOT_FOUND
                 )
             );
         }
 
-        return res.status(200).json({ sucess: true, data: bootcamp });
+        return res
+            .status(StatusCodes.OK)
+            .json({ sucess: true, data: bootcamp });
     });
 
     // @desc    Create new bootcamp
@@ -114,12 +117,14 @@ class BootcampsController {
             return next(
                 new ErrorResponse(
                     `Bootcamp not found with id of ${req.params.id}`,
-                    404
+                    StatusCodes.NOT_FOUND
                 )
             );
         }
 
-        return res.status(200).json({ sucess: true, data: bootcamp });
+        return res
+            .status(StatusCodes.OK)
+            .json({ sucess: true, data: bootcamp });
     });
 
     // @desc    Delete bootcamp
@@ -132,14 +137,14 @@ class BootcampsController {
             return next(
                 new ErrorResponse(
                     `Bootcamp not found with id of ${req.params.id}`,
-                    404
+                    StatusCodes.NOT_FOUND
                 )
             );
         }
 
         bootcamp.remove();
 
-        return res.status(200).json({ sucess: true, data: {} });
+        return res.status(StatusCodes.OK).json({ sucess: true, data: {} });
     });
 
     // @desc    Get bootcamps within a radius
@@ -163,7 +168,7 @@ class BootcampsController {
             },
         });
 
-        res.status(200).json({
+        res.status(StatusCodes.OK).json({
             sucess: true,
             count: bootcamps.length,
             data: bootcamps,

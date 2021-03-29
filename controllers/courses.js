@@ -2,6 +2,7 @@ import Course from '../models/Course';
 import Bootcamp from '../models/Bootcamp';
 import ErrorResponse from '../utils/errorResponse';
 import asyncHandler from '../middleware/asyncHandler';
+import StatusCodes from 'http-status-codes';
 
 class CoursesController {
     // @desc    List all courses
@@ -22,7 +23,7 @@ class CoursesController {
 
         const courses = await query;
 
-        return res.status(200).json({
+        return res.status(StatusCodes.OK).json({
             sucess: true,
             count: courses.length,
             data: courses,
@@ -42,12 +43,12 @@ class CoursesController {
             return next(
                 new ErrorResponse(
                     `No course with the id of ${req.params.id}`,
-                    404
+                    StatusCodes.NOT_FOUND
                 )
             );
         }
 
-        return res.status(200).json({
+        return res.status(StatusCodes.OK).json({
             sucess: true,
             data: course,
         });
@@ -65,7 +66,7 @@ class CoursesController {
             return next(
                 new ErrorResponse(
                     `No bootcamp with the id of ${req.params.bootcampId}`,
-                    404
+                    StatusCodes.NOT_FOUND
                 )
             );
         }
@@ -75,6 +76,55 @@ class CoursesController {
         return res.status(201).json({
             sucess: true,
             data: course,
+        });
+    });
+
+    // @desc    Update course
+    // @route   PUT /api/v1/courses/:id
+    // @access  Private
+    update = asyncHandler(async (req, res, next) => {
+        let course = await Course.findById(req.params.id);
+
+        if (!course) {
+            return next(
+                new ErrorResponse(
+                    `No course with the id of ${req.params.id}`,
+                    StatusCodes.NOT_FOUND
+                )
+            );
+        }
+
+        course = await Course.findByIdAndUpdate(req.params.id, req.body, {
+            new: true,
+            runValidators: true,
+        });
+
+        return res.status(StatusCodes.OK).json({
+            sucess: true,
+            data: course,
+        });
+    });
+
+    // @desc    Delete course
+    // @route   PUT /api/v1/courses/:id
+    // @access  Private
+    delete = asyncHandler(async (req, res, next) => {
+        const course = await Course.findById(req.params.id);
+
+        if (!course) {
+            return next(
+                new ErrorResponse(
+                    `No course with the id of ${req.params.id}`,
+                    StatusCodes.NOT_FOUND
+                )
+            );
+        }
+
+        await course.remove();
+
+        return res.status(StatusCodes.OK).json({
+            sucess: true,
+            data: {},
         });
     });
 }
