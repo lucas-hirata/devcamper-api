@@ -97,7 +97,27 @@ class AuthController {
 
         return res.status(StatusCodes.OK).json({
             sucess: true,
-            data: resetToken,
+            data: user,
+        });
+    });
+
+    // @desc    Forgot password
+    // @route   POST /api/v1/auth/forgotpassword
+    // @acess   Public
+    updateDetails = asyncHandler(async (req, res, next) => {
+        const fieldsToUpdate = {
+            name: req.body.name,
+            email: req.body.email,
+        };
+
+        const user = await User.findByIdAndUpdate(req.user.id, fieldsToUpdate, {
+            new: true,
+            runValidators: true,
+        });
+
+        return res.status(StatusCodes.OK).json({
+            sucess: true,
+            data: user,
         });
     });
 
