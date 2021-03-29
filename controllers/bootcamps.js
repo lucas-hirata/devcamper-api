@@ -1,3 +1,4 @@
+import path from 'path';
 import Bootcamp from '../models/Bootcamp';
 import ErrorResponse from '../utils/errorResponse';
 import asyncHandler from '../middleware/asyncHandler';
@@ -173,6 +174,79 @@ class BootcampsController {
             count: bootcamps.length,
             data: bootcamps,
         });
+    });
+
+    // @desc    Upload bootcamp photo
+    // @route   PUT /api/v1/bootcamps/:id/photos
+    // @access  Private
+    uploadPhoto = asyncHandler(async (req, res, next) => {
+        const bootcamp = await Bootcamp.findById(req.params.id);
+
+        if (!bootcamp) {
+            return next(
+                new ErrorResponse(
+                    `Bootcamp not found with id of ${req.params.id}`,
+                    StatusCodes.NOT_FOUND
+                )
+            );
+        }
+
+        if (!req.files) {
+            return next(
+                new ErrorResponse(
+                    `Please upload a file`,
+                    StatusCodes.BAD_REQUEST
+                )
+            );
+        }
+
+        const file = req.files.file;
+
+        // Check file type
+        if (!file.mimetype.startsWith('image')) {
+            return next(
+                new ErrorResponse(
+                    `Please upload an image file`,
+                    StatusCodes.BAD_REQUEST
+                )
+            );
+        }
+
+        // Check Filesize
+        if (file.size > process.env.FILE_UPLOAD_MAX_SIZE) {
+            return next(
+                new ErrorResponse(
+                    `Please upload an image less than ${proce.env.FILE_UPLOAD_MAX_SIZE}`,
+                    StatusCodes.BAD_REQUEST
+                )
+            );
+        }
+
+        // Create custom file name
+        file.name = `photo_${bootcamp._id}${path.parse(file.name).ext}`;
+
+        file.mv(
+            `${process.env.FILE_UPLOAD_PATH}/${file.name}`,
+            async (error) => {
+                if (error) {
+                    console.log(error);
+                    return next(
+                        new ErrorResponse(
+                            `Problem with file upload`,
+                            StatusCodes.INTERNAL_SERVER_ERROR
+                        )
+                    );
+                }
+
+                await Bootcamp.findByIdAndUpdate(req.params.id, {
+                    photo: file.name,
+                });
+
+                return res
+                    .status(StatusCodes.OK)
+                    .json({ sucess: true, data: file.name });
+            }
+        );
     });
 }
 

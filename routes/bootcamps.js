@@ -14,6 +14,8 @@ router
     .put(BootcampsController.update)
     .delete(BootcampsController.delete);
 
+router.route('/:id/photos').put(BootcampsController.uploadPhoto);
+
 router
     .route('/radius/:zipcode/:distance')
     .get(BootcampsController.getBootcampsInRadius);

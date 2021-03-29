@@ -1,7 +1,9 @@
+import path from 'path';
 import './config/config';
 import express from 'express';
 import morgan from 'morgan';
 import colors from 'colors';
+import fileUpload from 'express-fileupload';
 import connectDb from './config/db';
 import errorHandler from './middleware/errorHandler';
 
@@ -17,6 +19,12 @@ app.use(express.json());
 if (process.env.NODE_ENV === 'development') {
     app.use(morgan('dev', {}));
 }
+
+// File Upload
+app.use(fileUpload());
+
+// Set static folder
+app.use(express.static(path.join(process.env.PWD, 'public')));
 
 app.get('/', (request, response) => {
     response.status(200).send('Server up and running.');
