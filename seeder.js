@@ -9,6 +9,7 @@ connectDb();
 // Load Models
 import Bootcamp from './models/Bootcamp';
 import Course from './models/Course';
+import User from './models/User';
 
 // Read JSON files
 const bootcamps = JSON.parse(
@@ -21,11 +22,17 @@ const courses = JSON.parse(
     'utf-8'
 );
 
+const users = JSON.parse(
+    fs.readFileSync(`${process.env.PWD}/_data/users.json`),
+    'utf-8'
+);
+
 // Import into Database
 async function importData() {
     try {
         await Bootcamp.create(bootcamps);
         await Course.create(courses);
+        await User.create(users);
 
         console.log('Data imported...'.green.inverse);
         process.exit();
@@ -38,6 +45,7 @@ async function importData() {
 // Delete from database
 async function deleteData() {
     try {
+        await User.deleteMany();
         await Bootcamp.deleteMany();
         await Course.deleteMany();
 

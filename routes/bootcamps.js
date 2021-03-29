@@ -2,22 +2,32 @@ import express from 'express';
 import BootcampsController from '../controllers/bootcamps';
 import advancedResults from '../middleware/advancedResults';
 import Bootcamp from '../models/Bootcamp';
-import { protect } from '../middleware/auth';
+import { protect, authorize } from '../middleware/auth';
 
 const router = express.Router();
 
 router
     .route('/')
     .get(advancedResults(Bootcamp, 'courses'), BootcampsController.list)
-    .post(protect, BootcampsController.create);
+    .post(protect, authorize('publisher', 'admin'), BootcampsController.create);
 
 router
     .route('/:id')
     .get(BootcampsController.get)
-    .put(protect, BootcampsController.update)
-    .delete(protect, BootcampsController.delete);
+    .put(protect, authorize('publisher', 'admin'), BootcampsController.update)
+    .delete(
+        protect,
+        authorize('publisher', 'admin'),
+        BootcampsController.delete
+    );
 
-router.route('/:id/photos').put(protect, BootcampsController.uploadPhoto);
+router
+    .route('/:id/photos')
+    .put(
+        protect,
+        authorize('publisher', 'admin'),
+        BootcampsController.uploadPhoto
+    );
 
 router
     .route('/radius/:zipcode/:distance')

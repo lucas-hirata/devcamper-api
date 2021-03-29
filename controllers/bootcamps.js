@@ -39,6 +39,21 @@ class BootcampsController {
     // @route   POST /api/v1/bootcamps
     // @access  Private
     create = asyncHandler(async (req, res, next) => {
+        req.body.user = req.user.id;
+
+        // Check for published bootcamp
+        const publishedBootcamp = await Bootcamp.findOne({ user: req.user.id });
+
+        // If the user is not an admin, they can only add one bootcamp
+        if (publishedBootcamp && req.user.role !== 'admin') {
+            return next(
+                new ErrorResponse(
+                    `${req.user.id} has already published a bootcamp`,
+                    StatusCodes.BAD_REQUEST
+                )
+            );
+        }
+
         const bootcamp = await Bootcamp.create(req.body);
         return res.status(201).json({ sucess: true, data: bootcamp });
     });
