@@ -1,11 +1,13 @@
 import express from 'express';
 import BootcampsController from '../controllers/bootcamps';
+import advancedResults from '../middleware/advancedResults';
+import Bootcamp from '../models/Bootcamp';
 
 const router = express.Router();
 
 router
     .route('/')
-    .get(BootcampsController.list)
+    .get(advancedResults(Bootcamp, 'courses'), BootcampsController.list)
     .post(BootcampsController.create);
 
 router

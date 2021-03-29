@@ -10,24 +10,19 @@ class CoursesController {
     // @route   GET /api/v1/bootcamps/:bootcampId/courses
     // @access  Public
     list = asyncHandler(async (req, res, next) => {
-        let query;
-
         if (req.params.bootcampId) {
-            query = Course.find({ bootcamp: req.params.bootcampId });
-        } else {
-            query = Course.find().populate({
-                path: 'bootcamp',
-                select: 'name description',
+            const courses = await Course.find({
+                bootcamp: req.params.bootcampId,
             });
+
+            return res.status(StatusCodes.OK).json({
+                sucess: true,
+                count: courses.length,
+                data: courses,
+            });
+        } else {
+            return res.status(StatusCodes.OK).json(res.advancedResults);
         }
-
-        const courses = await query;
-
-        return res.status(StatusCodes.OK).json({
-            sucess: true,
-            count: courses.length,
-            data: courses,
-        });
     });
 
     // @desc    Get single course

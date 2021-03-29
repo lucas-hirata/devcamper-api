@@ -10,65 +10,7 @@ class BootcampsController {
     // @route   GET /api/v1/bootcamps
     // @access  Public
     list = asyncHandler(async (req, res, next) => {
-        let requestQuery = { ...req.query };
-
-        const paramsToRemove = ['select', 'sort', 'page', 'limit'];
-
-        paramsToRemove.forEach((param) => delete requestQuery[param]);
-
-        let queryString = JSON.stringify(requestQuery);
-        queryString.replace(/\b(gt|gte|lt|lte|in)\b/g, (match) => `$${match}`);
-
-        // Finding resources
-        let query = Bootcamp.find(JSON.parse(queryString)).populate('courses');
-
-        // Selecting
-        if (req.query.select) {
-            const fields = req.query.select.split(',').join(' ');
-            query = query.select(fields);
-        }
-
-        // Sorting
-        if (req.query.sort) {
-            const sortBy = req.query.sort.split(',').join(' ');
-            query = query.sort(sortBy);
-        } else {
-            query = query.sort('-createdAt');
-        }
-
-        // Pagination
-        const page = parseInt(req.query.page, 10) || 1;
-        const limit = parseInt(req.query.limit, 10) || 30;
-        const startIndex = (page - 1) * limit;
-        const endIndex = page * limit;
-        const total = await Bootcamp.countDocuments();
-
-        query = query.skip(startIndex).limit(limit);
-
-        // Query execution
-        const bootcamps = await query;
-
-        // Pagination result
-        const pagination = {};
-        if (endIndex < total) {
-            pagination.next = {
-                page: page + 1,
-                limit,
-            };
-        }
-        if (startIndex > 0) {
-            pagination.previous = {
-                page: page - 1,
-                limit,
-            };
-        }
-
-        return res.status(StatusCodes.OK).json({
-            sucess: true,
-            count: bootcamps.length,
-            pagination,
-            data: bootcamps,
-        });
+        return res.status(StatusCodes.OK).json(res.advancedResults);
     });
 
     // @desc    Get single bootcamp
