@@ -25,7 +25,6 @@ const courses = JSON.parse(
 async function importData() {
     try {
         await Bootcamp.create(bootcamps);
-        console.log('courses: ' + courses);
         await Course.create(courses);
 
         console.log('Data imported...'.green.inverse);
