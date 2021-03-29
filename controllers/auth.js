@@ -64,6 +64,43 @@ class AuthController {
         this.sendTokenResponse(user, StatusCodes.OK, res);
     });
 
+    // @desc    Get current logged in user
+    // @route   POST /api/v1/auth/me
+    // @acess   Private
+    getMe = asyncHandler(async (req, res, next) => {
+        const user = await User.findById(req.user.id);
+        return res.status(StatusCodes.OK).json({
+            sucess: true,
+            data: user,
+        });
+    });
+
+    // @desc    Forgot password
+    // @route   POST /api/v1/auth/forgotpassword
+    // @acess   Public
+    forgotPassword = asyncHandler(async (req, res, next) => {
+        const user = await User.findOne({ email: req.body.email });
+
+        if (!user) {
+            return next(
+                new ErrorResponse(
+                    'There is no user with that email',
+                    StatusCodes.NOT_FOUND
+                )
+            );
+        }
+
+        // Get reset token
+        const resetToken = user.getResetPasswordToken();
+
+        await user.save({ validateBeforeSave: false });
+
+        return res.status(StatusCodes.OK).json({
+            sucess: true,
+            data: resetToken,
+        });
+    });
+
     // Get token from model, create cookie and send response
     sendTokenResponse = (user, statusCode, res) => {
         // Create token
@@ -82,14 +119,6 @@ class AuthController {
             token,
         });
     };
-
-    getMe = asyncHandler(async (req, res, next) => {
-        const user = await User.findById(req.user.id);
-        return res.status(StatusCodes.OK).json({
-            sucess: true,
-            data: user,
-        });
-    });
 }
 
 export default new AuthController();
