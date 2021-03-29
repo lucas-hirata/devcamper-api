@@ -4,6 +4,7 @@ import express from 'express';
 import morgan from 'morgan';
 import colors from 'colors';
 import fileUpload from 'express-fileupload';
+import cookieParser from 'cookie-parser';
 import connectDb from './config/db';
 import errorHandler from './middleware/errorHandler';
 
@@ -14,6 +15,9 @@ const app = express();
 
 // Body parser
 app.use(express.json());
+
+// Cookie parser
+app.use(cookieParser());
 
 // Dev logging middleware
 if (process.env.NODE_ENV === 'development') {

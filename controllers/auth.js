@@ -18,13 +18,7 @@ class AuthController {
             role,
         });
 
-        // Create token
-        const token = user.getSignedJwtToken();
-
-        return res.status(StatusCodes.CREATED).json({
-            sucess: true,
-            token,
-        });
+        this.sendTokenResponse(user, StatusCodes.OK, res);
     });
 
     // @desc    Login user
@@ -67,14 +61,27 @@ class AuthController {
             );
         }
 
+        this.sendTokenResponse(user, StatusCodes.OK, res);
+    });
+
+    // Get token from model, create cookie and send response
+    sendTokenResponse = (user, statusCode, res) => {
         // Create token
         const token = user.getSignedJwtToken();
 
-        return res.status(StatusCodes.CREATED).json({
+        const options = {
+            expires: new Date(
+                Date.now() + process.env.JWT_COOKIE_EXPIRE * 24 * 60 * 60 * 1000
+            ),
+            httpOnly: true,
+            secure: process.env.NODE_ENV === 'production',
+        };
+
+        res.status(statusCode).cookie('token', token, options).json({
             sucess: true,
             token,
         });
-    });
+    };
 }
 
 export default new AuthController();
