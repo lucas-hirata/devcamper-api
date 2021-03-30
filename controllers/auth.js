@@ -121,6 +121,28 @@ class AuthController {
         });
     });
 
+    // @desc    Update password
+    // @route   PUT /api/v1/auth/updatepassword
+    // @acess   Private
+    updatePassword = asyncHandler(async (req, res, next) => {
+        const user = await User.findById(req.user.id).select('+password');
+
+        // Check current password
+        if (!(await user.matchPassword(req.body.currentPassword))) {
+            return next(
+                new ErrorResponse(
+                    'Password is incorrect',
+                    StatusCodes.FORBIDDEN
+                )
+            );
+        }
+
+        user.password = req.body.newPassword;
+        await user.save();
+
+        this.sendTokenResponse(user, StatusCodes.OK, res);
+    });
+
     // Get token from model, create cookie and send response
     sendTokenResponse = (user, statusCode, res) => {
         // Create token
