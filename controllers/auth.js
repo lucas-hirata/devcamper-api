@@ -1,5 +1,6 @@
 import User from '../models/User';
 import ErrorResponse from '../utils/errorResponse';
+import sendEmail from '../utils/sendEmail';
 import asyncHandler from '../middleware/asyncHandler';
 import StatusCodes from 'http-status-codes';
 
@@ -94,6 +95,34 @@ class AuthController {
         const resetToken = user.getResetPasswordToken();
 
         await user.save({ validateBeforeSave: false });
+
+        //Crete reset url
+        const resetUrl = `${req.protocol}://${req.get(
+            'host'
+        )}/api/v1/resetpassword/${resetToken}`;
+
+        const message = {
+            email: user.email,
+            subject: 'DevCamper - Password Reset Request',
+            text: `You are receiving this email because you requested a password reset. If this wasn\'t you, ignore this email. Else, please acess the following link to continue: ${resetUrl}`,
+        };
+
+        try {
+            await sendEmail(message);
+
+            res.status(StatusCodes.OK).json({
+                sucess: true,
+                data: 'Email sent',
+            });
+        } catch (error) {
+            console.log(error);
+            user.getResetPasswordToken = undefined;
+            user.getResetPasswordExpire = undefined;
+
+            await user.save({ validateBeforeSave: false });
+
+            return next(new ErrorResponse('Email could not be sent.'));
+        }
 
         return res.status(StatusCodes.OK).json({
             sucess: true,
