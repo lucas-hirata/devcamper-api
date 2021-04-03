@@ -2,6 +2,7 @@ import User from '../models/User';
 import ErrorResponse from '../utils/errorResponse';
 import sendEmail from '../utils/sendEmail';
 import asyncHandler from '../middleware/asyncHandler';
+import crypto from 'crypto';
 import StatusCodes from 'http-status-codes';
 
 class AuthController {
@@ -130,7 +131,37 @@ class AuthController {
         });
     });
 
-    // @desc    Forgot password
+    // @desc    Reset password
+    // @route   PUT /api/v1/auth/resetpassword/:resettoken
+    // @acess   Private
+    resetPassword = asyncHandler(async (req, res, next) => {
+        // Get hashed token
+        const resetPasswordToken = crypto
+            .createHash('sha256')
+            .update(req.params.resettoken)
+            .digest('hex');
+
+        const user = await User.findOne({
+            resetPasswordToken: resetPasswordToken,
+            resetPasswordExpire: { $gt: Date.now() },
+        });
+
+        if (!user) {
+            return next(
+                new ErrorResponse('Invalid Token', StatusCodes.BAD_REQUEST)
+            );
+        }
+
+        // Set new password
+        user.password = req.body.password;
+        user.resetPasswordToken = undefined;
+        user.resetPasswordExpire = undefined;
+        await user.save();
+
+        this.sendTokenResponse(user, StatusCodes.OK, res);
+    });
+
+    // @desc    Update details
     // @route   POST /api/v1/auth/forgotpassword
     // @acess   Public
     updateDetails = asyncHandler(async (req, res, next) => {
@@ -172,6 +203,13 @@ class AuthController {
         this.sendTokenResponse(user, StatusCodes.OK, res);
     });
 
+    // @desc    Signout
+    // @route   GET /api/v1/auth/signout
+    // @acess   Private
+    logout = asyncHandler(async (req, res, next) => {
+        this.clearTokenResponse(StatusCodes.OK, res);
+    });
+
     // Get token from model, create cookie and send response
     sendTokenResponse = (user, statusCode, res) => {
         // Create token
@@ -181,6 +219,23 @@ class AuthController {
             expires: new Date(
                 Date.now() + process.env.JWT_COOKIE_EXPIRE * 24 * 60 * 60 * 1000
             ),
+            httpOnly: true,
+            secure: process.env.NODE_ENV === 'production',
+        };
+
+        res.status(statusCode).cookie('token', token, options).json({
+            sucess: true,
+            token,
+        });
+    };
+
+    // Get token from model, create cookie and send response
+    clearTokenResponse = (statusCode, res) => {
+        // Create token
+        const token = '';
+
+        const options = {
+            expires: new Date(Date.now() + 1 * 60 * 1000),
             httpOnly: true,
             secure: process.env.NODE_ENV === 'production',
         };
