@@ -235,9 +235,8 @@ class AuthController {
         const token = '';
 
         const options = {
-            expires: new Date(Date.now() + 1 * 60 * 1000),
+            expires: new Date(Date.now() + 10 * 1000),
             httpOnly: true,
-            secure: process.env.NODE_ENV === 'production',
         };
 
         res.status(statusCode).cookie('token', token, options).json({
